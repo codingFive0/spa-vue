@@ -4,45 +4,52 @@
     <p>
       Informe sua conta e agência para acessar os dados de sua conta e realizar sua ações
     </p>
-    <form method="post" v-on:submit.prevent="submitForm">
+    <form method="post" v-on:submit.prevent="submitAccountForm">
       <div class="form-floating mb-2">
-        <input type="number" class="form-control" id="floatingInput" placeholder="0099988">
+        <input type="number" class="form-control" id="floatingInput" placeholder="0099988" v-model="login.account">
         <label for="floatingInput">Numero da conta</label>
       </div>
 
       <div class="form-floating  mb-3">
-        <input type="number" class="form-control" id="floatingPassword" placeholder="1444">
+        <input type="number" class="form-control" id="floatingPassword" placeholder="1444" v-model="login.agency">
         <label for="floatingPassword">Numero da agência</label>
       </div>
 
       <button class="w-100 btn btn-lg btn-primary" type="submit">Entrar</button>
     </form>
-
-    <div class="pt-5">
-      <h4>Ainda não possui conta?</h4>
-      <a href="#">Criar Minha Conta</a>
-
-    </div>
   </div>
 </template>
 
 
 <script>
-import axios from 'axios';
+import accounts from "@/services/accounts";
+import router from "@/router";
 
 export default {
   name: 'LoginAccount',
-  methods:{
-    submitForm(){
-      axios.post('/contact', this.form)
-          .then((res) => {
-            console.log(res)
-          })
-          .catch((error) => {
-            console.log(error)
-          }).finally(() => {
-        //Perform action in always
-      });
+  data() {
+    return {
+      loginNav: false,
+      login: {
+        account: '',
+        agency: '',
+      }
+    }
+  },
+  methods: {
+    submitAccountForm() {
+      accounts.login(this.login).then(resposta => {
+
+        if(resposta.data.message){
+          alert(resposta.data.message)
+          return;
+        }
+
+        router.replace('/gerenciamento/' + resposta.data.account)
+
+      }).catch(e => {
+        console.log(e)
+      })
     }
   }
 }
